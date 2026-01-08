@@ -1,0 +1,36 @@
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background: #3e5880;
+    display: flex;
+    justify-content: center;
+    padding: 40px;
+}
+
+.container {
+    background: rgb(118, 167, 211);
+    padding: 30px; border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    width: 100%;
+    max-width: 500px;
+}
+
+h1 {
+    text-align: center;
+    color: #333;
+}
+
+.player-box {
+    margin-bottom: 30px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+audio, video {
+    width: 100%;
+    margin-top: 10px;
+}
+
+span {
+    font-weight: bold;
+    color: #0e0f10;
+}

@@ -1,0 +1,20 @@
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    margin: 0;
+    background-color: #f0f2f5;
+}
+
+h2 {
+    color: #333;
+}
+
+#myCanvas {
+    background-color: #ffffff;
+    border: 2px solid #2c3e50;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
