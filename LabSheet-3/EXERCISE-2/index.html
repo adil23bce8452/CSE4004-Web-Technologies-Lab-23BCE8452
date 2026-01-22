@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Intelligent Shopping Cart</title>
+</head>
+<body>
+    <div class="shop-container">
+        <div class="card">
+            <h3>Catalog</h3>
+            <div id="product-list"></div>
+        </div>
+
+        <div class="card">
+            <h3>Your Cart</h3>
+            <div id="cart-items"></div>
+            <div style="margin-top:20px">
+                <input type="text" id="couponInput" placeholder="Try 'SAVE20'">
+                <button onclick="applyCoupon()">Apply</button>
+            </div>
+            <div class="totals">
+                <p>Subtotal: $<span id="subtotal">0.00</span></p>
+                <p class="discount-text">Discounts: -$<span id="discountTotal">0.00</span></p>
+                <h4>Total: $<span id="finalTotal">0.00</span></h4>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

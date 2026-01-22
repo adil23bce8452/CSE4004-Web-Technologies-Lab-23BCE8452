@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Activity Monitor</title>
+</head>
+<body>
+
+<div class="dashboard">
+    <div class="interaction-zone" id="parentZone">
+        <h2>Interactive Zone</h2>
+        <p>Try clicking, typing, or moving focus between inputs.</p>
+        
+        <input type="text" id="inputField" placeholder="Type something here...">
+        <br>
+        <button class="btn-target" id="clickButton">Click Me Repeatedly</button>
+        
+        <div id="alertBox" class="warning" style="margin-top: 20px;"></div>
+    </div>
+
+    <div class="log-panel">
+        <div class="log-header">
+            <span>ACTIVITY_LOG_v1.0</span>
+            <span id="eventCount">0</span>
+        </div>
+        <ul id="activityLog"></ul>
+        <div class="controls">
+            <button class="action-btn" onclick="exportLog()">EXPORT LOG</button>
+            <button class="action-btn" style="background:#ff4d4d" onclick="resetLog()">RESET</button>
+        </div>
+    </div>
+</div>
+
+<script src="script.js"></script>
+
+</body>
+</html>
