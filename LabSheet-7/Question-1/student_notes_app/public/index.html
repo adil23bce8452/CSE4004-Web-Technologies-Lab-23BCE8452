@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Notes Manager</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f4f9; padding: 20px; }
+        .container { max-width: 800px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        .form-group { margin-bottom: 15px; }
+        input, textarea { width: 100%; padding: 8px; margin-top: 5px; box-sizing: border-box; }
+        button { background: #007bff; color: white; border: none; padding: 10px 15px; cursor: pointer; border-radius: 4px; }
+        button:hover { background: #0056b3; }
+        .note-card { border: 1px solid #ddd; padding: 15px; margin-top: 15px; border-radius: 5px; background: #fafafa; }
+        .note-actions { margin-top: 10px; }
+        .btn-delete { background: #dc3545; }
+        .btn-delete:hover { background: #c82333; }
+        .btn-edit { background: #ffc107; color: black; }
+        .btn-edit:hover { background: #e0a800; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Student Notes Manager</h2>
+    
+    <div id="noteForm">
+        <div class="form-group">
+            <label>Title</label>
+            <input type="text" id="title" placeholder="e.g., MongoDB Basics" required>
+        </div>
+        <div class="form-group">
+            <label>Subject</label>
+            <input type="text" id="subject" placeholder="e.g., Database" required>
+        </div>
+        <div class="form-group">
+            <label>Description</label>
+            <textarea id="description" rows="3" placeholder="e.g., Introduction to MongoDB concepts" required></textarea>
+        </div>
+        <button onclick="addNote()">Add Note</button>
+    </div>
+
+    <hr>
+
+    <h3>My Notes</h3>
+    <div id="notesContainer"></div>
+</div>
+
+<script>
+    const API_URL = 'http://localhost:3000/notes';
+
+    // 1. View Notes
+    async function loadNotes() {
+        try {
+            const response = await fetch(API_URL);
+            const notes = await response.json();
+            
+            const container = document.getElementById('notesContainer');
+            container.innerHTML = ''; 
+
+            notes.forEach(note => {
+                const noteDiv = document.createElement('div');
+                noteDiv.className = 'note-card';
+                noteDiv.innerHTML = `
+                    <h4>${note.title} <small>(${note.subject})</small></h4>
+                    <p>${note.description}</p>
+                    <small><i>Created: ${note.created_date}</i></small>
+                    <div class="note-actions">
+                        <button class="btn-edit" onclick="updateNote('${note._id}', '${note.title}', '${note.description}')">Edit</button>
+                        <button class="btn-delete" onclick="deleteNote('${note._id}')">Delete</button>
+                    </div>
+                `;
+                container.appendChild(noteDiv);
+            });
+        } catch (error) {
+            console.error('Error fetching notes:', error);
+        }
+    }
+
+    // 2. Add Note
+    async function addNote() {
+        const title = document.getElementById('title').value;
+        const subject = document.getElementById('subject').value;
+        const description = document.getElementById('description').value;
+
+        if (!title || !subject || !description) return alert("Please fill all fields");
+
+        const noteData = { title, subject, description };
+
+        try {
+            await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(noteData)
+            });
+
+            document.getElementById('title').value = '';
+            document.getElementById('subject').value = '';
+            document.getElementById('description').value = '';
+            loadNotes();
+        } catch (error) {
+            console.error('Error adding note:', error);
+        }
+    }
+
+    // 3. Update Note
+    async function updateNote(id, currentTitle, currentDesc) {
+        const newTitle = prompt("Update Title:", currentTitle);
+        const newDesc = prompt("Update Description:", currentDesc);
+
+        if (newTitle && newDesc) {
+            try {
+                await fetch(`${API_URL}/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ title: newTitle, description: newDesc })
+                });
+                loadNotes();
+            } catch (error) {
+                console.error('Error updating note:', error);
+            }
+        }
+    }
+
+    // 4. Delete Note
+    async function deleteNote(id) {
+        if (confirm("Are you sure you want to delete this note?")) {
+            try {
+                await fetch(`${API_URL}/${id}`, {
+                    method: 'DELETE'
+                });
+                loadNotes();
+            } catch (error) {
+                console.error('Error deleting note:', error);
+            }
+        }
+    }
+
+    window.onload = loadNotes;
+</script>
+
+</body>
+</html>

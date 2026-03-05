@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Book Finder</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f4f9; padding: 20px; }
+        .container { max-width: 900px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        .controls { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+        input, select, button { padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
+        button { background: #007bff; color: white; cursor: pointer; border: none; }
+        button:hover { background: #0056b3; }
+        .book-card { border: 1px solid #ddd; padding: 15px; margin-bottom: 10px; border-radius: 5px; background: #fafafa; display: flex; justify-content: space-between; align-items: center;}
+        .book-info h4 { margin: 0 0 5px 0; }
+        .book-price { font-weight: bold; color: #28a745; font-size: 1.2em; }
+        .load-more { width: 100%; padding: 15px; margin-top: 10px; background: #28a745; font-size: 16px;}
+        .load-more:hover { background: #218838; }
+        .seed-btn { background: #ffc107; color: black; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Online Book Finder</h2>
+    
+    <button class="seed-btn" onclick="seedDatabase()">Populate Database with Dummy Data (Click First!)</button>
+
+    <div class="controls">
+        <input type="text" id="searchInput" placeholder="Search by title...">
+        <button onclick="searchBooks()">Search</button>
+
+        <select id="categorySelect" onchange="filterCategory()">
+            <option value="">All Categories</option>
+            <option value="Programming">Programming</option>
+            <option value="Database">Database</option>
+            <option value="CS">Computer Science</option>
+        </select>
+
+        <button onclick="sortBooks('price')">Sort by Price (Low to High)</button>
+        <button onclick="sortBooks('rating')">Sort by Rating (High to Low)</button>
+
+        <button onclick="getTopRated()">Top 5 Rated Books</button>
+    </div>
+
+    <div id="booksContainer"></div>
+    
+    <button class="load-more" id="loadMoreBtn" onclick="loadNextPage()">Load More (Page 2)</button>
+</div>
+
+<script>
+    const API_URL = 'http://localhost:3000/books';
+    let currentPage = 1;
+
+    // Helper: Seed Data
+    async function seedDatabase() {
+        await fetch(`${API_URL}/seed`, { method: 'POST' });
+        alert("Database populated! Loading books...");
+        loadBooks();
+    }
+
+    // Render Function
+    function renderBooks(books, append = false) {
+        const container = document.getElementById('booksContainer');
+        if (!append) container.innerHTML = ''; 
+
+        if (books.length === 0 && !append) {
+            container.innerHTML = '<p>No books found.</p>';
+            return;
+        }
+
+        books.forEach(book => {
+            const div = document.createElement('div');
+            div.className = 'book-card';
+            div.innerHTML = `
+                <div class="book-info">
+                    <h4>${book.title}</h4>
+                    <small>Author: ${book.author} | Category: ${book.category} | Year: ${book.year}</small><br>
+                    <small>Rating: ⭐ ${book.rating}</small>
+                </div>
+                <div class="book-price">₹${book.price}</div>
+            `;
+            container.appendChild(div);
+        });
+    }
+
+    // Default Load
+    async function loadBooks() {
+        currentPage = 1;
+        const res = await fetch(`${API_URL}?page=${currentPage}`);
+        const books = await res.json();
+        renderBooks(books);
+        document.getElementById('loadMoreBtn').style.display = 'block';
+    }
+
+    // 1. Search by Title
+    async function searchBooks() {
+        const title = document.getElementById('searchInput').value;
+        const res = await fetch(`${API_URL}/search?title=${title}`);
+        const books = await res.json();
+        renderBooks(books);
+        document.getElementById('loadMoreBtn').style.display = 'none';
+    }
+
+    // 2. Filter by Category
+    async function filterCategory() {
+        const category = document.getElementById('categorySelect').value;
+        if (!category) return loadBooks();
+        
+        const res = await fetch(`${API_URL}/category/${category}`);
+        const books = await res.json();
+        renderBooks(books);
+        document.getElementById('loadMoreBtn').style.display = 'none';
+    }
+
+    // 3. Sort
+    async function sortBooks(field) {
+        const res = await fetch(`${API_URL}/sort/${field}`);
+        const books = await res.json();
+        renderBooks(books);
+        document.getElementById('loadMoreBtn').style.display = 'none';
+    }
+
+    // 4. Top Rated
+    async function getTopRated() {
+        const res = await fetch(`${API_URL}/top`);
+        const books = await res.json();
+        renderBooks(books);
+        document.getElementById('loadMoreBtn').style.display = 'none';
+    }
+
+    // 5. Pagination
+    async function loadNextPage() {
+        currentPage++;
+        const res = await fetch(`${API_URL}?page=${currentPage}`);
+        const books = await res.json();
+        
+        if (books.length === 0) {
+            alert("No more books to load!");
+            document.getElementById('loadMoreBtn').style.display = 'none';
+            return;
+        }
+        
+        renderBooks(books, true);
+        document.getElementById('loadMoreBtn').innerText = `Load More (Page ${currentPage + 1})`;
+    }
+
+    window.onload = loadBooks;
+</script>
+
+</body>
+</html>
